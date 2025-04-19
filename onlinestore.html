@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+		
+		 /* Footer styling */
+        footer {
+            width: 100%;
+            padding: 10px;
+            background-color: navy;
+            color: white;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            width: 100%;
+            background-color: #005B96;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .navbar .logo img {
+            height: 50px;
+        }
+
+        .navbar nav {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .navbar nav a {
+            margin: 0 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .navbar nav a:hover {
+            color: #ccc;
+        }
+
+        .navbar #user-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar #username {
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .navbar .login-button:hover {
+            background-color: #002244;
+        }
+
+        .main-content {
+            flex: 1;
+            width: 100%;
+            padding: 20px;
+            background-color: #ecf0f1;
+        }
+
+        .cart-icon {
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: #ff5722;
+            color: white;
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 10px;
+        }
+
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 1200px) {
+            .products-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .products-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .products-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Product card styling */
+        .product-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+            cursor: pointer;
+            height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .product-details {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 16px;
+            color: #00bf63;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #E6E6FA;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #218838;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+
+        #user-section a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 32px;
+            transition: color 0.3s;
+        }
+
+       /* Sidebar styling */
+.sidebar {
+    position: absolute;
+    top: 93px; /* Adjust this value to the navbar height */
+    right: -400px; /* Start off-screen */
+    width: 400px;
+    height: calc(100% - 80px); /* Adjusted for navbar height */
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    padding: 20px;
+    overflow-y: auto; /* Add scroll if items exceed sidebar height */
+}
+
+.sidebar h2 {
+    margin-bottom: 20px; /* Adjust this value for more or less space */
+}
+ .sidebar.active {
+            right: 0; /* Slide in */
+        }
+
+.close-btn {
+    font-size: 20px;
+    cursor: pointer;
+    float: right;
+    color: #333;
+    margin-bottom: 30px; /* Add margin below close button */
+}
+
+/* Sidebar cart item styling */
+.cart-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    transition: transform 0.3s;
+    cursor: pointer;
+    height: 100px; /* Set a fixed height for all items */
+    margin-bottom: 20px; /* Space between items */
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+	 width: 100%;
+}
+
+.cart-item img {
+    width: 70px; 
+    height: auto;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.cart-item .item-details {
+    flex-grow: 1;
+}
+
+.cart-item .item-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0; 
+}
+
+.cart-item .item-price {
+    font-size: 14px;
+    color: #00bf63;
+    margin: 0; /* Remove margin to eliminate space */
+    line-height: 1; /* Ensure there’s no extra line height */
+}
+
+/* Optional: Adjust the item-details container for better layout */
+.cart-item .item-details {
+    display: flex;
+    flex-direction: column; /* Stack name and price vertically */
+    justify-content: center; /* Center align vertically */
+}
+
+
+
+.quantity-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Aligns buttons to the right */
+    margin-top: 10px; /* Space above quantity buttons */
+}
+
+
+
+.quantity-button {
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 5px;
+    transition: background-color 0.3s;
+}
+
+/* Added styling for the empty cart message */
+.cart-items p {
+    text-align: center;
+    font-size: 16px;
+    color: #666; /* Dim color for the empty cart message */
+}
+
+    .quantity-button.red {
+        background-color: #ff4d4d; /* Red background for - button */
+        color: white; /* White text */
+    }
+
+    .quantity-button.red:hover {
+        background-color: #cc0000; /* Darker red on hover */
+    }
+
+    .quantity-button.green {
+        background-color: #28a745; /* Green background for + button */
+        color: white; /* White text */
+    }
+
+    .quantity-button.green:hover {
+        background-color: #218838; /* Darker green on hover */
+    }
+	
+	
+	 .cart-summary {
+            margin-top: auto; /* Push to bottom of sidebar */
+            padding: 10px 0;
+            border-top: 1px solid #ccc; /* Optional: Add a top border for separation */
+        }
+
+        .cart-summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .place-order-btn:hover {
+            background-color: #0056b3;
+        }
+		
+		.delete-icon {
+    font-size: 18px;
+    color: black;
+    cursor: pointer;
+    margin-left: 10px; /* Space between the increase button and dustbin icon */
+    transition: color 0.3s;
+}
+
+.delete-icon:hover {
+    color: #cc0000; /* Darker red on hover */
+}
+
+		
+		.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.5s, bottom 0.5s;
+    z-index: 1001;
+}
+
+.toast.show {
+    opacity: 1;
+    bottom: 40px; /* Raised position when visible */
+}
+
+.order-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 20px;
+    color: white;
+    border-radius: 5px;
+    opacity: 0.9;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.success-toast {
+    background-color: green;
+}
+
+.empty-cart-toast {
+    background-color: #0cc0df;
+}
+
+.error-toast {
+    background-color: red;
+}
+
+.search-container h1 {
+    text-align: center; /* Center the text */
+    color: #005B96;
+    margin-top: 10px;  /* Adjust the top margin as needed */
+    margin-bottom: 10px; /* Adjust the bottom margin as needed */
+}
+
+/* Search bar styling */
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Space between heading and search bar */
+    margin: 20px 0; /* Margin for separation */
+}
+
+.search-container input {
+    width: 250px; /* Adjust width as desired */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #005B96;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo"><img src="images/logo.jpg" alt="Logo"></div>
+        <nav>
+            <a href="onlinestore.html">Online Store</a>
+            <a href="myorders.html">Orders</a>
+            <a href="bookapointment.html">Book Now</a>
+            <a href="myappointments.html">Appointments</a>
+            <a href="OurBarbers.html">Barbers</a>
+        </nav>
+		
+        <div class="cart-icon" id="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cart-count">0</span>
+        </div>
+		
+		<div id="user-section">
+            <span id="username"></span>
+            <a href="home.html"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </div>
+	
+<div class="search-container">
+    <h1>Elevate Your Hair Game!</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search products...">
+        <button id="search-button" type="button"><i class="fas fa-search"></i></button>
+    </div>
+</div>
+	
+
+    <div class="main-content">
+        <div class="products-container">
+            <!-- Product cards will be injected here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Sidebar for Cart -->
+    <div class="sidebar" id="cart-sidebar">
+        <div class="close-btn" id="close-btn">&times;</div>
+        <h2>Your Cart</h2>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items will be displayed here -->
+        </div>
+		<div class="cart-summary">
+            <p>Total: <span id="cart-total">R0.00</span></p>
+            <p>Items: <span id="cart-count">0</span></p>
+            <button class="place-order-btn" id="place-order-btn">Place Order</button>
+        </div>
+    </div>
+	
+	
+	<div id="toast" class="toast"></div>
+	
+	<div id="notification" class="notification hidden"></div>
+
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+        authDomain: "barberbuzz-d6811.firebaseapp.com",
+        databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+        projectId: "barberbuzz-d6811",
+        storageBucket: "barberbuzz-d6811.appspot.com",
+        messagingSenderId: "564879600873",
+        appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const productsContainer = document.querySelector('.products-container');
+    const username = localStorage.getItem('username') || ''; // Retrieve username
+    let cartItems = []; // Store cart items
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalDisplay = document.getElementById('cart-total');
+    const cartCountDisplay = document.getElementById('cart-count');
+	
+	 let allProducts = [];
+	 
+	 // Search functionality
+    document.getElementById('search-button').addEventListener('click', () => {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const filteredProducts = allProducts.filter(product => 
+            product.name.toLowerCase().includes(searchTerm)
+        );
+        renderProducts(filteredProducts);
+    });
+	
+	
+	
+	function showToast(productName) {
+    const toast = document.getElementById('toast');
+    toast.innerText = `${productName} has been added to the cart`;
+    toast.classList.add('show');
+    
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+    }
+	
+
+    // Function to calculate total number of items (quantities) in the cart
+    function calculateTotalItems() {
+        let totalItems = 0;
+        cartItems.forEach((item) => {
+            totalItems += item.quantity;
+        });
+        return totalItems;
+    }
+
+    // Function to calculate total price
+    function calculateTotalPrice() {
+        let totalPrice = 0;
+        cartItems.forEach((item) => {
+            const itemTotalPrice = parseFloat(item.price.replace('R', '')) * item.quantity;
+            totalPrice += itemTotalPrice;
+        });
+        return `R${totalPrice.toFixed(2)}`;
+    }
+
+    // Update cart count and total price display
+    function updateCartCount() {
+    const totalItems = calculateTotalItems();
+    cartCountDisplay.innerText = totalItems; // Badge count
+    document.querySelector('.cart-summary #cart-count').innerText = totalItems; // Items: count in summary
+    renderCartItems();
+    updateTotalPriceDisplay();
+}
+
+    // Display total price in the cart sidebar
+    function updateTotalPriceDisplay() {
+        cartTotalDisplay.innerText = calculateTotalPrice();
+    }
+
+     // Fetch products from Firebase and render them
+    onValue(ref(database, 'products'), (snapshot) => {
+        allProducts = []; // Clear previous products
+        productsContainer.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+            const product = childSnapshot.val();
+            allProducts.push(product); // Store all products for later filtering
+        });
+        renderProducts(allProducts); // Initial render of all products
+    });
+
+    // Function to render products
+    function renderProducts(products) {
+        productsContainer.innerHTML = ''; // Clear existing products
+        products.forEach((product) => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('product-card');
+
+            productCard.innerHTML = `
+                <img src="${product.imageUrl}" alt="${product.name}" style="width:100%; height:auto;">
+                <div class="product-details">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${product.price}</div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            `;
+
+            productCard.querySelector('.add-to-cart').addEventListener('click', () => {
+                addToCart(product);
+            });
+
+            productsContainer.appendChild(productCard);
+        });
+    }
+
+    // Function to add product to cart
+    function addToCart(product) {
+        const existingItem = cartItems.find(item => item.name === product.name);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cartItems.push({ ...product, quantity: 1 });
+        }
+        updateCartCount();
+        updateCartInDatabase();
+        showToast(product.name); // Show toast notification
+    }
+
+
+    // Update the cart in the Firebase database
+    function updateCartInDatabase() {
+        if (username) {
+            const cartRef = ref(database, 'cart/' + username);
+            set(cartRef, cartItems);
+        }
+    }
+
+    // Load cart items from Firebase when the page loads
+    if (username) {
+        loadCartFromDatabase();
+    }
+
+    // Load cart items from the Firebase database
+    function loadCartFromDatabase() {
+        const cartRef = ref(database, 'cart/' + username);
+        onValue(cartRef, (snapshot) => {
+            cartItems = [];
+            snapshot.forEach((childSnapshot) => {
+                const product = childSnapshot.val();
+                if (product) {
+                    cartItems.push(product);
+                }
+            });
+            updateCartCount();
+        });
+    }
+
+    // Toggle cart sidebar visibility
+    document.getElementById('cart-icon').addEventListener('click', () => {
+        cartSidebar.classList.toggle('active');
+    });
+
+    // Close the cart sidebar
+    document.getElementById('close-btn').addEventListener('click', () => {
+        cartSidebar.classList.remove('active');
+    });
+
+    // Render cart items in the sidebar
+    function renderCartItems() {
+    cartItemsContainer.innerHTML = '';
+    if (cartItems.length === 0) {
+        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+    }
+    cartItems.forEach((item) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('cart-item');
+
+        itemDiv.innerHTML = `
+            <img src="${item.imageUrl}" alt="${item.name}">
+            <div class="item-details">
+                <div class="item-name">${item.name}</div>
+                <div class="quantity-buttons">
+                    <button class="quantity-button red">-</button>
+                    <span class="item-quantity">${item.quantity}</span>
+                    <button class="quantity-button green">+</button>
+                    <i class="fas fa-trash-alt delete-icon"></i> <!-- Dustbin icon -->
+                </div>
+                <div class="item-price">${item.price}</div>
+            </div>
+        `;
+
+        const decreaseButton = itemDiv.querySelector('.red');
+        const increaseButton = itemDiv.querySelector('.green');
+        const deleteButton = itemDiv.querySelector('.delete-icon'); // Dustbin icon
+
+        decreaseButton.addEventListener('click', () => {
+            updateQuantity(item.name, -1);
+        });
+
+        increaseButton.addEventListener('click', () => {
+            updateQuantity(item.name, 1);
+        });
+
+        deleteButton.addEventListener('click', () => {
+            deleteCartItem(item.name); // Call delete function on click
+        });
+
+        cartItemsContainer.appendChild(itemDiv);
+    });
+    updateTotalPriceDisplay();
+}
+
+
+function deleteCartItem(itemName) {
+    cartItems = cartItems.filter(item => item.name !== itemName);
+    updateCartCount();
+    updateCartInDatabase();
+    renderCartItems();
+}
+
+
+
+    // Function to update quantity of an item in the cart
+    function updateQuantity(itemName, change) {
+        const existingItem = cartItems.find(item => item.name === itemName);
+        if (!existingItem) return;
+
+        if (change === -1) {
+            if (existingItem.quantity > 1) {
+                existingItem.quantity -= 1;
+            } else {
+                cartItems = cartItems.filter(item => item.name !== itemName);
+            }
+        } else if (change === 1) {
+            existingItem.quantity += 1;
+        }
+
+        updateCartCount();
+        updateCartInDatabase();
+        renderCartItems();
+    }
+	
+	// Function to generate unique order ID
+function generateUniqueId() {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    return Array.from({ length: 5 }, () => characters[Math.floor(Math.random() * characters.length)]).join("");
+}
+
+function displayToast(message, duration = 3000, uniqueClass) {
+    const toast = document.createElement("div");
+    toast.className = `order-toast ${uniqueClass}`; // Changed to order-toast
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    // Automatically remove the toast after the specified duration
+    setTimeout(() => {
+        toast.remove();
+    }, duration);
+}
+
+// Function to place the order
+function placeOrder() {
+    if (cartItems.length === 0) {
+        displayToast("Your cart is empty!", 3000, "empty-cart-toast"); // Toast if the cart is empty
+        return;
+    }
+
+    const orderId = generateUniqueId(); // Generate unique order ID
+    const totalPrice = calculateTotalPrice(); // Calculate total price
+
+    // Retrieve email from Firebase
+    const emailRef = ref(database, `users/Clients/${username}/email`);
+    onValue(emailRef, (snapshot) => {
+        const email = snapshot.val(); // Get the email from the snapshot
+
+        // Create order object
+        const order = {
+            orderId: orderId,
+            totalPrice: totalPrice,
+            status: "pending",
+            items: {},
+            email: email // Include email in the order details
+        };
+
+        // Store each cart item in the order, including imageUrl
+        cartItems.forEach((item, index) => {
+            order.items[index] = {
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                imageUrl: item.imageUrl // Include imageUrl in the order items
+            };
+        });
+
+        // Save the order to the Firebase database
+ const ordersRef = ref(database, 'orders/' + username + '/' + orderId);
+        set(ordersRef, order)
+            .then(() => {
+                displayToast(`Order placed successfully! Your order ID is: ${orderId}`, 8000, "success-toast");
+                cartItems = []; // Clear cart after placing order
+                updateCartInDatabase(); // Update cart in database
+                updateCartCount(); // Update cart count display
+                renderCartItems(); // Render cart items (which will now be empty)
+            })
+            .catch((error) => {
+                console.error("Error placing order: ", error);
+                displayToast("There was an error placing your order. Please try again.", 3000, "error-toast");
+            });
+    }, { onlyOnce: true }); // Fetch email only once
+}
+
+
+// Add event listener to the "Place Order" button
+document.getElementById('place-order-btn').addEventListener('click', placeOrder);
+
+
+
+</script>
+
+
+
+
+
+<footer>
+        <p>&copy; 2024 BarberBuzz. All rights reserved.</p>
+    </footer>
+	
+</body>
+</html>

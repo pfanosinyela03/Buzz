@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .register-container {
+      background-color: white;
+      padding: 50px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      width: 350px;
+      border: 2px solid #005B96; /* Blue lining */
+    }
+
+    .register-container h2 {
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: #003366;
+      text-align: center;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .register-container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #005B96;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .register-container button:hover {
+      background-color: #003366;
+    }
+
+    .register-container p {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .register-container a {
+      color: #005B96;
+      text-decoration: none;
+    }
+
+    .register-container input:focus {
+      outline: none;
+      border-color: #005B96;
+      box-shadow: 0 0 5px rgba(0, 91, 150, 0.5);
+    }
+
+    /* Toast styles */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+    }
+
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @keyframes fadein {
+      from {bottom: 0; opacity: 0;} 
+      to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadeout {
+      from {bottom: 30px; opacity: 1;} 
+      to {bottom: 0; opacity: 0;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="register-container">
+    <h2>Register</h2>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+
+        <button type="submit" id="submit">Register</button>
+    </form>
+    <p>Already have an Account? <a href="login.html">Login</a></p>
+</div>
+
+<!-- Toast container -->
+<div id="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+        authDomain: "barberbuzz-d6811.firebaseapp.com",
+        databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+        projectId: "barberbuzz-d6811",
+        storageBucket: "barberbuzz-d6811.appspot.com",
+        messagingSenderId: "564879600873",
+        appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const fullName = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        // Function to show toast notifications
+        const showToast = (message) => {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        };
+
+        // Check password length
+        if (password.length < 8) {
+            showToast("Password must be at least 8 characters long.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showToast("Passwords do not match.");
+            return;
+        }
+
+        // Check if the user already exists
+        const userRef = ref(database, 'users/Clients/' + username);
+        get(userRef)
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    // Show toast notification for existing user
+                    showToast("User already exists!");
+                } else {
+                    // Save user to the Firebase database
+                    set(userRef, {
+                        username: username,
+                        fullName: fullName,
+                        email: email,
+                        password: password
+                    })
+                    .then(() => {
+                        // Show toast notification for successful registration
+                        showToast("Registration successful!");
+
+                        // Redirect to the login page after a delay
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 3000);
+                    })
+                    .catch((error) => {
+                        showToast("Error registering user: " + error.message);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error("Error checking user existence: ", error);
+            });
+    });
+</script>
+
+</body>
+</html>

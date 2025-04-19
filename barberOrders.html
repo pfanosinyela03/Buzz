@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="stylesheet" href="logoutmodal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 50px; 
+        }
+
+        .sidebar .logo img {
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+        }
+
+        .sidebar .logo p {
+            font-size: 25px; 
+            color: #00BF63; 
+            font-weight: bold; 
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 35px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            border-radius: 5px;
+        }
+
+        /* Top Navigation Bar Styles */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 250px; 
+            right: 0;
+            height: 89px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; 
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px; 
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative; 
+        }
+
+        .orders-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .order-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column; 
+        }
+
+        .order-card:hover {
+            transform: scale(1.02);
+        }
+
+        .order-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-details {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .items-list {
+            margin-top: 10px;
+            flex-grow: 1; 
+        }
+
+        .item {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between; 
+            margin-top: 10px;
+        }
+
+        .button-container button {
+            background-color: #28a745; 
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container button.decline {
+            background-color: #dc3545;
+        }
+
+        .button-container button.clear {
+            background-color: #0097B2; 
+        }
+
+        .button-container button:hover {
+            opacity: 0.9;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+            authDomain: "barberbuzz-d6811.firebaseapp.com",
+            databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+            projectId: "barberbuzz-d6811",
+            storageBucket: "barberbuzz-d6811.appspot.com",
+            messagingSenderId: "564879600873",
+            appId: "1:564879600873:web:2308af42d9418ce8439478"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        function fetchOrders() {
+            const ordersRef = ref(db, 'orders/');
+            onValue(ordersRef, (snapshot) => {
+                const orders = snapshot.val();
+                const ordersContainer = document.getElementById('orders-container');
+                ordersContainer.innerHTML = '';
+
+                if (orders) {
+                    Object.entries(orders).forEach(([username, userOrders]) => {
+                        Object.entries(userOrders).forEach(([orderId, orderData]) => {
+                            const orderCard = document.createElement('div');
+                            orderCard.className = 'order-card';
+
+                            const orderTitle = document.createElement('div');
+                            orderTitle.className = 'order-title';
+                            orderTitle.textContent = `Customer: ${username}`;
+
+                            const detailsContainer = document.createElement('div');
+
+                            const orderIdDetail = document.createElement('div');
+                            orderIdDetail.className = 'order-details';
+                            orderIdDetail.textContent = `Order ID: ${orderId}`;
+                            detailsContainer.appendChild(orderIdDetail);
+
+                            const orderStatusDetail = document.createElement('div');
+                            orderStatusDetail.className = 'order-details';
+                            orderStatusDetail.textContent = `Status: ${orderData.status}`;
+                            detailsContainer.appendChild(orderStatusDetail);
+
+                            const totalPriceDetail = document.createElement('div');
+                            totalPriceDetail.className = 'order-details';
+                            totalPriceDetail.textContent = `Total Price: R${orderData.totalPrice}`;
+                            detailsContainer.appendChild(totalPriceDetail);
+
+                            const itemsList = document.createElement('div');
+                            itemsList.className = 'items-list';
+
+                            if (orderData.items && Array.isArray(orderData.items)) {
+                                orderData.items.forEach(item => {
+                                    const itemDetail = document.createElement('div');
+                                    itemDetail.className = 'item';
+                                    itemDetail.textContent = `Product: ${item.birdSpecies || item.name}, Quantity: ${item.quantity}`;
+                                    itemsList.appendChild(itemDetail);
+                                });
+                            }
+
+                            const buttonContainer = document.createElement('div');
+                            buttonContainer.className = 'button-container';
+
+                            const approveButton = document.createElement('button');
+                            approveButton.textContent = 'Approve';
+                            approveButton.onclick = () => approveOrder(username, orderId);
+
+                            const declineButton = document.createElement('button');
+                            declineButton.textContent = 'Decline';
+                            declineButton.className = 'decline';
+                            declineButton.onclick = () => declineOrder(username, orderId);
+
+                            const clearButton = document.createElement('button');
+                            clearButton.textContent = 'Clear';
+                            clearButton.className = 'clear';
+                            clearButton.onclick = () => clearOrder(username, orderId);
+
+                            buttonContainer.appendChild(approveButton);
+                            buttonContainer.appendChild(declineButton);
+                            buttonContainer.appendChild(clearButton);
+
+                            orderCard.appendChild(orderTitle);
+                            orderCard.appendChild(detailsContainer);
+                            orderCard.appendChild(itemsList);
+                            orderCard.appendChild(buttonContainer);
+                            ordersContainer.appendChild(orderCard);
+                        });
+                    });
+                } else {
+                    ordersContainer.innerHTML = '<p>No orders available.</p>';
+                }
+            });
+        }
+
+        function approveOrder(username, orderId) {
+            const orderRef = ref(db, `orders/${username}/${orderId}`);
+            update(orderRef, { status: 'Approved' })
+                .then(() => alert('Order approved successfully!'))
+
+                .catch(error => alert('Error approving order: ' + error));
+        }
+
+        function declineOrder(username, orderId) {
+            const orderRef = ref(db, `orders/${username}/${orderId}`);
+            update(orderRef, { status: 'Declined' })
+                .then(() => alert('Order declined successfully!'))
+                .catch(error => alert('Error declining order: ' + error));
+        }
+
+        function clearOrder(username, orderId) {
+            const orderRef = ref(db, `orders/${username}/${orderId}`);
+            remove(orderRef)
+                .then(() => alert('Order cleared successfully!'))
+                .catch(error => alert('Error clearing order: ' + error));
+        }
+
+        window.onload = fetchOrders;
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="images/barberlogo.png" alt="Logo">
+            <p>Barber Buzz</p>
+        </div>
+                <ul>
+            <li><a href="barberDashboard.html"><i class="fas fa-home"></i>Dashboard</a></li>
+            <li><a href="barberOrders.html"><i class="fas fa-box"></i>Orders</a></li>
+            <li><a href="barberAddHairstyle.html"><i class="fas fa-user-edit"></i>Add Hairstyle</a></li>
+            <li><a href="barberAddProduct.html"><i class="fas fa-plus-circle"></i>Add Product</a></li>
+            <li><a href="barberManageProducts.html"><i class="fas fa-boxes"></i>Products</a></li>
+            <li><a href="barberManageHairstyles.html"><i class="fas fa-cut"></i>Hairstyles</a></li>
+            <li><a href="barberAppointments.html"><i class="fas fa-calendar-alt"></i>Appointments</a></li>
+            <li><a href="barberSettings.html"><i class="fas fa-cogs"></i>Settings</a></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </div>
+
+
+    <div class="top-nav">
+        <h1>Orders</h1>
+    </div>
+
+    <div class="main-content">
+        <div id="orders-container" class="orders-container">
+            
+        </div>
+    </div>
+	
+	
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmLogout">Yes</button>
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        
+        const modal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeBtn = document.querySelector('.close');
+        const confirmLogout = document.getElementById('confirmLogout');
+        const cancelLogout = document.getElementById('cancelLogout');
+
+        
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link action
+            modal.style.display = 'block'; // Show the modal
+        });
+
+        
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+       
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+       
+        confirmLogout.onclick = function() {
+            window.location.href = 'home.html';
+        };
+
+        
+        cancelLogout.onclick = function() {
+            modal.style.display = 'none';
+        };
+    </script>
+
+
+   
+</body>
+</html>

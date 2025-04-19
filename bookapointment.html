@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+		
+		/* Toast CSS */
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px; /* Center the toast */
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px; /* Adjust the position as needed */
+    font-size: 17px;
+    transition: visibility 0s, opacity 0.5s linear;
+    opacity: 0;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            width: 100%;
+            background-color: #005B96;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+		
+
+
+        .navbar .logo img {
+            height: 50px;
+        }
+
+        .navbar nav {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .navbar nav a {
+            margin: 0 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+		
+	
+
+        .navbar nav a:hover {
+            color: #ccc;
+        }
+
+        .navbar #user-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar #username {
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .navbar .login-button {
+            padding: 10px 20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .login-button:hover {
+            background-color: #002244;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            width: 100%;
+            padding: 20px;
+            background-color: #ecf0f1;
+        }
+
+        .hairstyles-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto; /* Center the container */
+        }
+
+        .hairstyle-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            cursor: pointer;
+            height: 250px;
+        }
+
+        .hairstyle-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .hairstyle-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .hairstyle-card:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.3); /* Dark overlay */
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 10% auto; /* Centered with margin */
+            padding: 20px;
+            border: none;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px; /* More responsive */
+            animation: slide-in 0.5s; /* Animation for modal */
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #005B96;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #005B96; /* Header color */
+            font-size: 24px;
+        }
+
+        label {
+            margin-top: 10px;
+            display: block;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #005B96;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #003366;
+        }
+
+        /* Footer styling */
+        footer {
+            width: 100%;
+            padding: 10px;
+            background-color: navy;
+            color: white;
+            text-align: center;
+            margin-top: auto;
+        }
+		
+	.search-container h1 {
+    text-align: center; /* Center the text */
+    color: #005B96;
+    margin-top: 10px;  /* Adjust the top margin as needed */
+    margin-bottom: 10px; /* Adjust the bottom margin as needed */
+}
+
+/* Search bar styling */
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Space between heading and search bar */
+    margin: 20px 0; /* Margin for separation */
+}
+
+.search-container input {
+    width: 250px; /* Adjust width as desired */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#user-section a {
+    color: #e74c3c;               
+    text-decoration: none;         
+    font-size: 32px;               
+    transition: color 0.3s;        
+}
+    </style>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const username = localStorage.getItem('username');
+        const usernameElement = document.getElementById('username');
+        usernameElement.textContent = username ? username : 'Guest'; // Set username or 'Guest'
+    });
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+        authDomain: "barberbuzz-d6811.firebaseapp.com",
+        databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+        projectId: "barberbuzz-d6811",
+        storageBucket: "barberbuzz-d6811.appspot.com",
+        messagingSenderId: "564879600873",
+        appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+   const hairstylesContainer = document.querySelector('.hairstyles-container');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+
+    // Array to hold all hairstyles for searching
+    let hairstylesData = [];
+
+    // Fetch hairstyles data
+        onValue(ref(database, 'hairstyles'), (snapshot) => {
+        hairstylesContainer.innerHTML = ''; // Clear previous entries
+        hairstylesData = []; // Clear previous hairstyles data
+        snapshot.forEach((childSnapshot) => {
+            const hairstyle = childSnapshot.val();
+            hairstylesData.push(hairstyle); // Store hairstyle for searching
+            const hairstyleCard = document.createElement('div');
+            hairstyleCard.classList.add('hairstyle-card');
+            hairstyleCard.innerHTML = `
+                <img src="${hairstyle.imageUrl}" alt="${hairstyle.name}">
+                <div class="hairstyle-name">${hairstyle.name}</div>
+            `;
+
+            hairstyleCard.addEventListener('click', () => openModal(hairstyle.name));
+            hairstylesContainer.appendChild(hairstyleCard);
+        });
+    }, { onlyOnce: true });
+
+
+
+// Search functionality
+    searchButton.addEventListener('click', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        filterHairstyles(query);
+    });
+
+    // Function to filter hairstyles based on the search input
+    function filterHairstyles(query) {
+        hairstylesContainer.innerHTML = ''; // Clear current hairstyles
+        const filteredHairstyles = hairstylesData.filter(hairstyle => 
+            hairstyle.name.toLowerCase().includes(query)
+        );
+
+        // Render filtered hairstyles
+        filteredHairstyles.forEach(hairstyle => {
+            const hairstyleCard = document.createElement('div');
+            hairstyleCard.classList.add('hairstyle-card');
+            hairstyleCard.innerHTML = `
+                <img src="${hairstyle.imageUrl}" alt="${hairstyle.name}">
+                <div class="hairstyle-name">${hairstyle.name}</div>
+            `;
+
+            hairstyleCard.addEventListener('click', () => openModal(hairstyle.name));
+            hairstylesContainer.appendChild(hairstyleCard);
+        });
+
+        if (filteredHairstyles.length === 0) {
+            hairstylesContainer.innerHTML = '<p>No hairstyles found.</p>';
+        }
+    }
+
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = "toast show";
+        setTimeout(() => {
+            toast.className = toast.className.replace("show", "");
+        }, 3000);
+    }
+
+    function openModal(hairstyleName) {
+        const modal = document.getElementById('modal');
+        const hairstyleNameInput = document.getElementById('hairstyle-name');
+        const priceInput = document.getElementById('price');
+        const durationInput = document.getElementById('duration'); 
+        const barberSelect = document.getElementById('barber');
+        const timeSelect = document.getElementById('time');
+        const bookButton = document.getElementById('book-appointment');
+
+        hairstyleNameInput.value = hairstyleName;
+        priceInput.value = '';
+        durationInput.value = '';
+        barberSelect.innerHTML = '';
+        timeSelect.innerHTML = '';
+
+        for (let hour = 9; hour <= 19; hour++) {
+            const optionAM = document.createElement('option');
+            optionAM.value = `${hour}:00`;
+            optionAM.textContent = `${hour}:00`;
+            timeSelect.appendChild(optionAM);
+
+            const optionPM = document.createElement('option');
+            optionPM.value = `${hour}:30`;
+            optionPM.textContent = `${hour}:30`;
+            timeSelect.appendChild(optionPM);
+        }
+
+        onValue(ref(database, 'hairstyles/' + hairstyleName), (snapshot) => {
+            if (snapshot.exists()) {
+                const hairstyle = snapshot.val();
+                priceInput.value = hairstyle.price;
+                durationInput.value = hairstyle.duration;
+            } else {
+                console.error('Hairstyle not found');
+            }
+        });
+
+        onValue(ref(database, 'users/Barbers'), (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const barberName = childSnapshot.key;
+                const option = document.createElement('option');
+                option.value = barberName;
+                option.textContent = barberName;
+                barberSelect.appendChild(option);
+            });
+        }, { onlyOnce: true });
+
+        modal.style.display = 'block';
+
+        bookButton.onclick = () => {
+            const username = localStorage.getItem('username');
+            if (!username) {
+                showToast('Please log in to book an appointment.');
+                return;
+            }
+
+            const selectedDateInput = document.getElementById('date').value;
+            if (!selectedDateInput) {
+                showToast('Please select a date.');
+                return;
+            }
+
+            const [year, month, day] = selectedDateInput.split('-').map(Number);
+            const selectedDateDisplay = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+            const selectedTime = timeSelect.value;
+            const barberName = barberSelect.value;
+
+            const [hours, minutes] = selectedTime.split(':').map(Number);
+
+            if (!(hours === 9 || (hours >= 10 && hours <= 18) || (hours === 19 && minutes === 0))) {
+                showToast('You can only book appointments between 9 AM and 7 PM.');
+                return;
+            }
+
+            const now = new Date();
+            if (new Date(year, month - 1, day, hours, minutes) < now) {
+                showToast('You cannot book an appointment for a past time.');
+                return;
+            }
+
+            const barberAppointmentsRef = ref(database, `barberAppointments/${barberName}`);
+
+            onValue(barberAppointmentsRef, (snapshot) => {
+                let isConflict = false;
+
+                snapshot.forEach((appointmentSnapshot) => {
+                    const appointment = appointmentSnapshot.val();
+
+                    if (appointment.date === selectedDateDisplay) {
+                        const [appointmentHours, appointmentMinutes] = appointment.time.split(':').map(Number);
+                        const appointmentDateTime = new Date(year, month - 1, day, appointmentHours, appointmentMinutes);
+                        const selectedDateTime = new Date(year, month - 1, day, hours, minutes);
+                        const bufferEndDateTime = new Date(appointmentDateTime.getTime() + 45 * 60 * 1000);
+
+                        if (selectedDateTime >= appointmentDateTime && selectedDateTime < bufferEndDateTime) {
+                            isConflict = true;
+                            return true;
+                        }
+                    }
+                });
+
+                if (isConflict) {
+                    showToast('This barber is already booked during the selected date and time. Please choose a different slot.');
+                } else {
+                    const appointmentData = {
+                        hairstyleName: hairstyleName,
+                        price: priceInput.value,
+                        barberName: barberName,
+                        date: selectedDateDisplay,
+                        time: selectedTime,
+                        username: username
+                    };
+
+                    const userAppointmentsRef = ref(database, `appointments/${username}`);
+                    const appointmentKey = push(userAppointmentsRef).key;
+
+                    set(ref(database, `appointments/${username}/${appointmentKey}`), appointmentData)
+                        .then(() => set(ref(database, `barberAppointments/${barberName}/${appointmentKey}`), appointmentData))
+                        .then(() => {
+                            showToast('Your appointment has been booked successfully!');
+                            modal.style.display = 'none';
+                        })
+                        .catch((error) => {
+                            console.error('Error booking appointment:', error);
+                            showToast('Failed to book appointment. Please try again.');
+                        });
+                }
+            }, { onlyOnce: true });
+        };
+        
+        document.getElementById('cancel-appointment').onclick = () => {
+            closeModal();
+        };
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    };
+</script>
+
+
+
+
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo"><img src="images/logo.jpg" alt="Logo"></div>
+        <nav>
+            <a href="onlinestore.html">Online Store</a>
+            <a href="myorders.html">Orders</a>
+            <a href="bookapointment.html">Book Now</a>
+            <a href="myappointments.html">Appointments</a>
+            <a href="OurBarbers.html">Barbers</a>
+        </nav>
+        <div id="user-section">
+            <span id="username">Username</span>
+            <a href="home.html" <i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </div>
+	
+	
+	
+
+<div id="toast" class="toast"></div>
+
+
+
+<div class="search-container">
+    <h1>Book Your Appointment</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search hairstyles...">
+        <button id="search-button" type="button"><i class="fas fa-search"></i></button>
+    </div>
+</div>
+
+
+    <div class="main-content">
+        
+        <div class="hairstyles-container"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+    <div class="modal-content">
+        <h2>Book Appointment</h2>
+        <label for="hairstyle-name">Hairstyle</label>
+        <input type="text" id="hairstyle-name" readonly>
+        <label for="price">Price</label>
+        <input type="text" id="price" readonly>
+        <label for="duration">Duration</label>
+        <input type="text" id="duration" readonly>
+        <label for="barber">Choose Barber</label>
+        <select id="barber"></select>
+        <label for="date">Date</label>
+       <input type="date" id="date" />
+        <label for="time">Time</label>
+        <input type="time" id="time" required>
+
+        <!-- Modal buttons at the bottom -->
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button id="cancel-appointment">Cancel</button> 
+            <button id="book-appointment">Book Now</button>
+        </div>
+    </div>
+</div>
+
+    <footer>
+        <p>&copy; 2024 BarberBuzz. All rights reserved.</p>
+    </footer>
+	
+	
+	
+
+</body>
+</html>

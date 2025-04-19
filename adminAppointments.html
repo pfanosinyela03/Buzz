@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="stylesheet" href="logoutmodal.css">
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+            authDomain: "barberbuzz-d6811.firebaseapp.com",
+            databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+            projectId: "barberbuzz-d6811",
+            storageBucket: "barberbuzz-d6811.appspot.com",
+            messagingSenderId: "564879600873",
+            appId: "1:564879600873:web:2308af42d9418ce8439478"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to retrieve appointments
+        function fetchAppointments() {
+            const appointmentsRef = ref(database, 'appointments/');
+            onValue(appointmentsRef, (snapshot) => {
+                const appointments = snapshot.val();
+                if (appointments) {
+                    checkAndRemovePastAppointments(appointments); // Check for past appointments
+                }
+                displayAppointments(appointments);
+            }, {
+                onlyOnce: true
+            });
+        }
+
+        // Function to check and remove past appointments
+        function checkAndRemovePastAppointments(appointments) {
+            for (const username in appointments) {
+                const userAppointments = appointments[username];
+                for (const appointmentId in userAppointments) {
+                    const appointment = userAppointments[appointmentId];
+                    if (isPastAppointment(appointment.date, appointment.time)) {
+                        // Remove the past appointment from the database
+                        remove(ref(database, `appointments/${username}/${appointmentId}`));
+                    }
+                }
+            }
+        }
+
+        // Function to check if an appointment is past
+        function isPastAppointment(dateString, timeString) {
+            const appointmentDate = parseDate(dateString, timeString);
+            const currentDate = new Date();
+            const twoHoursAgo = new Date(currentDate.getTime() - 2 * 60 * 60 * 1000); // Get the time two hours ago
+            return appointmentDate < twoHoursAgo; // Return true if the appointment is more than 2 hours in the past
+        }
+
+        // Function to display appointments in CardView layout
+        function displayAppointments(appointments) {
+            const appointmentsContainer = document.getElementById('appointments-container');
+            appointmentsContainer.innerHTML = ''; // Clear previous appointments
+
+            let appointmentList = []; // Create an array to hold appointments
+
+            if (appointments) {
+                for (const username in appointments) {
+                    const userAppointments = appointments[username];
+                    for (const appointmentId in userAppointments) {
+                        const appointment = userAppointments[appointmentId];
+                        appointmentList.push({ id: appointmentId, username, ...appointment }); // Include appointment ID
+                    }
+                }
+
+                // Sort appointments by date (DD/MM/YYYY) and time
+                appointmentList.sort((a, b) => {
+                    const dateA = parseDate(a.date, a.time); // Parse appointment A's date and time
+                    const dateB = parseDate(b.date, b.time); // Parse appointment B's date and time
+                    return dateA - dateB; // Compare dates (earliest first)
+                });
+
+                // Display sorted appointments as cards
+                appointmentList.forEach((appointment, index) => {
+                    displayAppointmentCard(index + 1, appointment); // Pass appointment object directly
+                });
+            } else {
+                appointmentsContainer.innerHTML = '<p>No appointments found.</p>';
+            }
+        }
+
+        // Function to parse date from DD/MM/YYYY and time
+        function parseDate(dateString, timeString) {
+            const [day, month, year] = dateString.split('/').map(Number);
+            const [hours, minutes] = timeString.split(':').map(Number);
+            return new Date(year, month - 1, day, hours, minutes); // Create Date object
+        }
+
+        // Function to display an appointment as a card
+        function displayAppointmentCard(count, appointment) {
+            const appointmentsContainer = document.getElementById('appointments-container');
+            const card = document.createElement('div');
+            card.className = 'appointment-card';
+            card.innerHTML = `
+                <h3>Appointment #${count}</h3>
+                <p><strong>Client:</strong> ${appointment.username}</p>
+                <p><strong>Barber:</strong> ${appointment.barberName}</p>
+                <p><strong>Date:</strong> ${appointment.date}</p>
+                <p><strong>Hairstyle Name:</strong> ${appointment.hairstyleName}</p>
+                <p><strong>Price:</strong> ${appointment.price}</p>
+                <p><strong>Time:</strong> ${appointment.time}</p>
+            `;
+            appointmentsContainer.appendChild(card);
+        }
+
+        // Fetch appointments on page load
+        window.onload = fetchAppointments;
+    </script>
+    <style>
+                * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 50px; 
+        }
+
+        .sidebar .logo img {
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+        }
+
+        .sidebar .logo p {
+            font-size: 25px; 
+            color: #00BF63; 
+            font-weight: bold; 
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            border-radius: 5px;
+        }
+
+        /* Top Navigation Bar Styles */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 250px; 
+            right: 0;
+            height: 89px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; 
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px; 
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative; 
+        }
+        .appointments-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 20px;
+        }
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px;
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative;
+        }
+
+        .appointments-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Increase card size */
+            gap: 20px;
+        }
+
+        .appointment-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px; /* Increase padding for bigger cards */
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1.1em; /* Slightly increase font size */
+        }
+
+        .appointment-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .appointment-card h3 {
+            margin: 0;
+            font-size: 1.5em; /* Increase card title size */
+        }
+    </style>
+</head>
+<body>
+   <div class="sidebar">
+        <div class="logo">
+            <img src="images/barberlogo.png" alt="Logo">
+            <p>Barber Buzz</p>
+        </div>
+        <ul>
+           <ul>
+            <li><a href="adminDashboard.html"><i class="fas fa-home"></i>Dashboard</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Users</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i>Orders</a></li>
+            <li><a href="add-hairstyle.html"><i class="fas fa-user-edit"></"></i>Add Hairstyle</a></li>
+            <li><a href="add-product.html"><i class="fas fa-plus-circle"></i>Add Product</a></li>
+            <li><a href="manage-products.html"><i class="fas fa-boxes"></i>Products</a></li>
+            <li><a href="view-hairstyles.html"><i class="fas fa-cut"></i>Hairstyles</a></li>
+            <li><a href="approve-request.html"><i class="fas fa-user-check"></i>Barber Requests</a></li>
+            <li><a href="adminAppointments.html"><i class="fas fa-calendar-alt"></i>Appointments</a></li>
+			<li><a href="adminbarbers.html"><i class="fas fa-user-friends"></i>Barbers</a></li>
+            <li><a href="adminsettings.html"><i class="fas fa-cogs"></i>Settings</a></li>
+           <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+        </ul>
+    </div>
+	
+	 <div class="top-nav">
+        <h1>Appointments</h1>
+    </div>
+
+    <div class="main-content">
+    <div id="appointments-container" class="appointments-container"></div>
+	</div>
+	
+	<!-- Modal structure -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmLogout">Yes</button>
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        // Get the modal and the logout button
+        const modal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeBtn = document.querySelector('.close');
+        const confirmLogout = document.getElementById('confirmLogout');
+        const cancelLogout = document.getElementById('cancelLogout');
+
+        // Show the modal when logout button is clicked
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link action
+            modal.style.display = 'block'; // Show the modal
+        });
+
+        // Hide the modal when the close button (X) is clicked
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        // If the user clicks outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Log out and redirect to home.html when user clicks 'Yes'
+        confirmLogout.onclick = function() {
+            window.location.href = 'home.html';
+        };
+
+        // Close the modal when 'Cancel' is clicked
+        cancelLogout.onclick = function() {
+            modal.style.display = 'none';
+        };
+    </script>
+</body>
+</html>

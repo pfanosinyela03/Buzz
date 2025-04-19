@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <link rel="stylesheet" href="logoutmodal.css">
+    <style>
+	
+	
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 50px; 
+        }
+
+        .sidebar .logo img {
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+        }
+
+        .sidebar .logo p {
+            margin-top: 5px; 
+            font-size: 25px; 
+            color: #00BF63; 
+            font-weight: bold; 
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            border-radius: 5px;
+        }
+
+        /* Top Navigation Bar Styles */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 250px;
+            right: 0;
+            height: 89px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px; 
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative; 
+        }
+
+        /* Admin Profile Image Styles */
+        .admin-profile {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .admin-profile img {
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid #2980b9;
+        }
+
+        .admin-profile p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #ecf0f1; 
+        }
+
+        /* Grid Layout Styles */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px;
+            margin-top: 20px; 
+        }
+
+        .grid-item {
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center; 
+            background-color:#a6a6a6;
+            padding: 40px;
+            min-height: 430px; 
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-item i {
+            font-size: 50px;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+
+        .grid-item h3 {
+            font-size: 24px; 
+            margin-bottom: 10px;
+        }
+
+        .grid-item p {
+            color: #2980b9;
+            font-size: 18px; 
+        }
+
+        /* Hidden File Input */
+        .file-input {
+            display: none; 
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="images/barberlogo.png" alt="Logo">
+            <p>Barber Buzz</p>
+        </div>
+        <ul>
+            <li><a href="adminDashboard.html"><i class="fas fa-home"></i>Dashboard</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Users</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i>Orders</a></li>
+            <li><a href="add-hairstyle.html"><i class="fas fa-user-edit"></i>Add Hairstyle</a></li>
+            <li><a href="add-product.html"><i class="fas fa-plus-circle"></i>Add Product</a></li>
+            <li><a href="manage-products.html"><i class="fas fa-boxes"></i>Products</a></li>
+            <li><a href="view-hairstyles.html"><i class="fas fa-cut"></i>Hairstyles</a></li>
+            <li><a href="approve-request.html"><i class="fas fa-user-check"></i>Barber Requests</a></li>
+            <li><a href="adminAppointments.html"><i class="fas fa-calendar-alt"></i>Appointments</a></li>
+            <li><a href="adminbarbers.html"><i class="fas fa-user-friends"></i>Barbers</a></li>
+            <li><a href="adminsettings.html"><i class="fas fa-cogs"></i>Settings</a></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </div>
+	
+	
+
+    <div class="top-nav">
+        <h1>Admin Dashboard</h1>
+        <div class="admin-profile" onclick="document.getElementById('imageUpload').click();">
+            <input type="file" id="imageUpload" class="file-input" accept="image/*" onchange="previewImage(event)">
+            <img src="https://via.placeholder.com/60" id="adminImage" alt="Admin Profile">
+            <p>Admin</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="grid-container">
+            <div class="grid-item" onclick="window.location.href='add-hairstyle.html'">
+                <i class="fas fa-user-edit"></i>
+                <h3>Add New Hairstyle</h3>
+                <p>Manage the available hairstyles in the system</p>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='add-product.html'">
+                <i class="fas fa-plus-circle"></i>
+                <h3>Add New Product</h3>
+                <p>Add new products to your inventory</p>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='approve-request.html'">
+                <i class="fas fa-user-check"></i>
+                <h3>Approve Barbers</h3>
+                <p>Approve barber requests for the platform</p>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='view-hairstyles.html'">
+                <i class="fas fa-cut"></i>
+                <h3>Manage Hairstyles</h3>
+                <p>See and manage all available hairstyles</p>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='manage-products.html'">
+                <i class="fas fa-boxes"></i>
+                <h3>Manage Products</h3>
+                <p>Manage the inventory of products</p>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='AdminAppointments.html'">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Manage Appointments</h3>
+                <p>Manage all appointments on the system</p>
+            </div>
+        </div>
+    </div>
+	
+	<!-- Modal structure -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmLogout">Yes</button>
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        // Get the modal and the logout button
+        const modal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeBtn = document.querySelector('.close');
+        const confirmLogout = document.getElementById('confirmLogout');
+        const cancelLogout = document.getElementById('cancelLogout');
+
+        // Show the modal when logout button is clicked
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link action
+            modal.style.display = 'block'; // Show the modal
+        });
+
+        // Hide the modal when the close button (X) is clicked
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        // If the user clicks outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Log out and redirect to home.html when user clicks 'Yes'
+        confirmLogout.onclick = function() {
+            window.location.href = 'home.html';
+        };
+
+        // Close the modal when 'Cancel' is clicked
+        cancelLogout.onclick = function() {
+            modal.style.display = 'none';
+        };
+    </script>
+	
+	<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+    import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-storage.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+        authDomain: "barberbuzz-d6811.firebaseapp.com",
+        databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+        projectId: "barberbuzz-d6811",
+        storageBucket: "barberbuzz-d6811.appspot.com",
+        messagingSenderId: "564879600873",
+        appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const storage = getStorage(app);
+
+    // Retrieve the image URL on page load
+    window.onload = function() {
+        const adminImageRef = ref(database, 'users/Admin/imageUrl');
+        onValue(adminImageRef, (snapshot) => {
+            const url = snapshot.val();
+            if (url) {
+                document.getElementById('adminImage').src = url; // Update image src
+            }
+        });
+    };
+
+    // Handle image upload
+    function uploadImage(file) {
+        const storageReference = storageRef(storage, 'images/' + file.name);
+        uploadBytes(storageReference, file).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+            getDownloadURL(snapshot.ref).then((downloadURL) => {
+                // Use 'update' to only change the imageUrl without overwriting other info
+                const userRef = ref(database, 'users/Admin');
+                update(userRef, {
+                    imageUrl: downloadURL
+                }).then(() => {
+                    console.log('Image URL updated in database:', downloadURL);
+                }).catch((error) => {
+                    console.error('Error updating image URL in database:', error);
+                });
+            });
+        }).catch((error) => {
+            console.error('Error uploading file:', error);
+        });
+    }
+
+    // Preview the image and upload it immediately
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            // Preview the image
+            const image = document.getElementById('adminImage');
+            image.src = URL.createObjectURL(file);
+
+            // Upload the image to Firebase immediately
+            uploadImage(file);
+        }
+    }
+
+    // Make the previewImage function globally accessible
+    window.previewImage = previewImage;
+</script>
+
+
+</body>
+
+</html>

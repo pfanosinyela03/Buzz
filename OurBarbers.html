@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber List</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Ensure no margin */
+            padding: 0; /* Ensure no padding */
+            background-color: #f4f4f4;
+        }
+		
+		 /* Footer styling */
+        footer {
+            width: 100%;
+            padding: 10px;
+            background-color: navy;
+            color: white;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            width: 100%;
+            background-color: #005B96;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-sizing: border-box; /* Include padding in width calculation */
+            position: fixed; /* Fix navbar at the top */
+            top: 0; /* Align to the top */
+            left: 0; /* Align to the left */
+            z-index: 1000; /* Ensure it sits above other content */
+        }
+
+        .navbar .logo img {
+            height: 50px;
+        }
+
+        .navbar nav {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .navbar nav a {
+            margin: 0 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .navbar nav a:hover {
+            color: #ccc;
+        }
+
+        .navbar #user-section {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Align items to the right */
+            padding-right: 20px; /* Add padding to avoid cutting off */
+        }
+
+        .navbar #username {
+            font-weight: bold;
+            margin-right: 15px; /* Space between username and sign-out icon */
+            color: #ffffff; /* Make the username white for better visibility */
+            font-size: 16px; /* Adjust font size as needed */
+        }
+
+        .navbar #user-section a {
+            color: #e74c3c;               
+            text-decoration: none;         
+            font-size: 32px;               
+            transition: color 0.3s;  
+        }
+
+        .navbar #user-section a:hover {
+            color: #c0392b; /* Darken on hover for better feedback */
+        }
+
+        h1 {
+            text-align: center;
+            color: #005B96;
+            margin: 110px 0 20px; /* Add margin-top to push content below fixed navbar */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 16px;
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background-color: #ccc;
+        }
+
+        .text-content {
+            flex-grow: 1;
+        }
+
+        .barber-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            margin: 0;
+        }
+
+        .barber-email {
+            font-size: 18px;
+            color: #808080;
+            margin: 4px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .star {
+            font-size: 50px;
+            color: #ddd;
+            margin: 0 2px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .star.selected {
+            color: #f39c12; /* Highlighted star color */
+        }
+    </style>
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+        import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+            authDomain: "barberbuzz-d6811.firebaseapp.com",
+            databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+            projectId: "barberbuzz-d6811",
+            storageBucket: "barberbuzz-d6811.appspot.com",
+            messagingSenderId: "564879600873",
+            appId: "1:564879600873:web:2308af42d9418ce8439478"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+		const username = localStorage.getItem('username') || '';
+
+        // Display the username in the user section
+        document.addEventListener('DOMContentLoaded', () => {
+            const usernameElement = document.getElementById('username');
+            usernameElement.textContent = username ? username : 'Guest'; // Show 'Guest' if no username is set
+            fetchOrders(); // Fetch orders after the username is displayed
+        });
+
+       async function fetchBarbers() {
+    const dbRef = ref(db);
+    const barberContainer = document.getElementById('barber-list');
+    barberContainer.innerHTML = ''; // Clear existing content
+
+    try {
+        const snapshot = await get(child(dbRef, 'users/Barbers'));
+
+        if (snapshot.exists()) {
+            const barbers = snapshot.val();
+            for (const barberId in barbers) {
+                const barber = barbers[barberId];
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const content = document.createElement('div');
+                content.className = 'card-content';
+
+                const img = document.createElement('img');
+                img.src = barber.profileImageUrl || 'images/profile.jpg';
+                img.alt = `${barber.barberName}'s Profile Image`;
+                img.className = 'profile-image';
+
+                const textContent = document.createElement('div');
+                textContent.className = 'text-content';
+
+                const name = document.createElement('p');
+                name.className = 'barber-name';
+                name.textContent = barber.barberName;
+
+                const email = document.createElement('p');
+                email.className = 'barber-email';
+                email.textContent = barber.email;
+
+                const ratingBar = document.createElement('div');
+                ratingBar.className = 'rating-bar';
+
+                // Display filled stars based on the barber's current rating from the database
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star';
+                    star.textContent = '☆';
+
+                    // Use Math.round() to round the barber's rating to the nearest whole number
+                    const roundedRating = Math.round(barber.rating || 0);
+
+                    if (i <= roundedRating) {
+                        star.classList.add('selected'); // Full star
+                    }
+
+                    star.addEventListener('click', async () => {
+                        await rateBarber(barberId, i, ratingBar);
+                    });
+
+                    ratingBar.appendChild(star);
+                }
+
+                textContent.appendChild(name);
+                textContent.appendChild(email);
+                content.appendChild(img);
+                content.appendChild(textContent);
+                card.appendChild(content);
+                card.appendChild(ratingBar);
+                barberContainer.appendChild(card);
+            }
+        } else {
+            barberContainer.innerHTML = '<p class="message">No barbers found.</p>';
+        }
+    } catch (error) {
+        console.error('Error fetching barbers:', error);
+        barberContainer.innerHTML = '<p class="message">Error fetching barbers.</p>';
+    }
+}
+
+
+async function rateBarber(barberId, rating, ratingBar) {
+    const username = localStorage.getItem('username');
+    if (!username) {
+        alert('You must be logged in to rate.');
+        return;
+    }
+
+    const barberRef = ref(db, `users/Barbers/${barberId}`);
+    const currentTime = Date.now();
+
+    try {
+        const barberSnapshot = await get(barberRef);
+        const ratings = barberSnapshot.child("ratings").val() || {};
+        const lastRatingTime = ratings[username] || 0;
+
+        if (currentTime - lastRatingTime < 24 * 60 * 60 * 1000) {
+            alert('You have already rated this barber within the last 24 hours.');
+            return;
+        }
+
+        const currentRating = barberSnapshot.child("rating").val() || 0;
+        const ratingCount = barberSnapshot.child("ratingCount").val() || 0;
+
+        const newRatingCount = ratingCount + 1;
+        const newRating = ((currentRating * ratingCount) + rating) / newRatingCount;
+
+        ratings[username] = currentTime; // Update only the timestamp for this user in ratings
+
+        await update(barberRef, {
+            rating: newRating,  // Use the calculated new average
+            ratingCount: newRatingCount,
+            ratings: ratings
+        });
+
+        // Fetch the updated rating from the database and update the UI
+        const updatedSnapshot = await get(barberRef);
+        const updatedRating = updatedSnapshot.child("rating").val() || 0;
+
+        updateRatingUI(updatedRating, ratingBar);
+        console.log(`Rating ${updatedRating} for ${barberId} recorded for user ${username}`);
+        alert("Thank you for your rating!");
+        
+        // Refresh the page after the alert
+        location.reload(); // This line refreshes the page
+
+    } catch (error) {
+        console.error('Error updating rating:', error);
+        alert("Error submitting rating.");
+    }
+}
+
+
+
+    function updateRatingUI(rating, ratingBar) {
+    Array.from(ratingBar.children).forEach((star, index) => {
+        star.classList.toggle('selected', index < rating);
+    });
+    }
+
+        window.onload = fetchBarbers;
+    </script>
+</head>
+<body>
+ <div class="navbar">
+        <div class="logo"><img src="images/logo.jpg" alt="Logo"></div>
+        <nav>
+            <a href="onlinestore.html">Online Store</a>
+            <a href="myorders.html">Orders</a>
+            <a href="bookapointment.html">Book Now</a>
+            <a href="myappointments.html">Appointments</a>
+            <a href="OurBarbers.html">Barbers</a>
+        </nav>
+        <div id="user-section">
+            <span id="username"></span> <!-- Display username here -->
+            <a href="home.html"><i class="fas fa-sign-out-alt"></i></a> <!-- Sign out icon -->
+        </div>
+    </div>
+    <h1>Our Barbers</h1>
+    <div class="grid-container" id="barber-list">
+        <h1>Our Barbers</h1>
+    </div>
+	
+	
+	
+</body>
+</html>

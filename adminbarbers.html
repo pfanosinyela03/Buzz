@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber Profiles</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	  <link rel="stylesheet" href="logoutmodal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 50px; 
+        }
+
+        .sidebar .logo img {
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+        }
+
+        .sidebar .logo p {
+            margin-top: 5px; 
+            font-size: 25px; 
+            color: #00BF63; 
+            font-weight: bold; 
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            border-radius: 5px;
+        }
+
+        /* Top Navigation Bar Styles */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 250px; 
+            right: 0;
+            height: 89px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; 
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px; 
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative; 
+        }
+		
+        .barber-card {
+            border: 1px solid #ccc;
+            padding: 16px;
+            margin: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+        }
+        .barber-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 16px;
+        }
+        .barber-info {
+            flex-grow: 1;
+        }
+        .ratings-bar {
+            margin-top: 8px;
+        }
+        .star {
+            font-size: 20px;
+            color: #ccc; 
+        }
+        .star.filled {
+            color: #f39c12; 
+        }
+        .pause-resume-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px; 
+            color: #333; 
+            margin-left: 16px; 
+        }
+    </style>
+</head>
+<body>
+  <div class="sidebar">
+        <div class="logo">
+            <img src="images/barberlogo.png" alt="Logo">
+            <p>Barber Buzz</p>
+        </div>
+        <ul>
+           <ul>
+            <li><a href="adminDashboard.html"><i class="fas fa-home"></i>Dashboard</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Users</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i>Orders</a></li>
+            <li><a href="add-hairstyle.html"><i class="fas fa-user-edit"></"></i>Add Hairstyle</a></li>
+            <li><a href="add-product.html"><i class="fas fa-plus-circle"></i>Add Product</a></li>
+            <li><a href="manage-products.html"><i class="fas fa-boxes"></i>Products</a></li>
+            <li><a href="view-hairstyles.html"><i class="fas fa-cut"></i>Hairstyles</a></li>
+            <li><a href="approve-request.html"><i class="fas fa-user-check"></i>Barber Requests</a></li>
+            <li><a href="adminAppointments.html"><i class="fas fa-calendar-alt"></i>Appointments</a></li>
+			<li><a href="adminbarbers.html"><i class="fas fa-user-friends"></i>Barbers</a></li>
+            <li><a href="adminsettings.html"><i class="fas fa-cogs"></i>Settings</a></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </div>
+
+
+
+    <div class="top-nav">
+        <h1>Manage Barber Profiles</h1>
+		</div>
+
+
+   <div class="main-content">
+    <div id="barberList"></div>
+	</div>
+	
+	
+	<!-- Modal structure -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmLogout">Yes</button>
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        // Get the modal and the logout button
+        const modal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeBtn = document.querySelector('.close');
+        const confirmLogout = document.getElementById('confirmLogout');
+        const cancelLogout = document.getElementById('cancelLogout');
+
+        // Show the modal when logout button is clicked
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link action
+            modal.style.display = 'block'; // Show the modal
+        });
+
+        // Hide the modal when the close button (X) is clicked
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        // If the user clicks outside the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Log out and redirect to home.html when user clicks 'Yes'
+        confirmLogout.onclick = function() {
+            window.location.href = 'home.html';
+        };
+
+        // Close the modal when 'Cancel' is clicked
+        cancelLogout.onclick = function() {
+            modal.style.display = 'none';
+        };
+    </script>
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, get, child, set, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+        authDomain: "barberbuzz-d6811.firebaseapp.com",
+        databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+        projectId: "barberbuzz-d6811",
+        storageBucket: "barberbuzz-d6811.appspot.com",
+        messagingSenderId: "564879600873",
+        appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Function to fetch and display barbers (active and on hold)
+    const fetchBarbers = async () => {
+        const barberList = document.getElementById('barberList');
+        barberList.innerHTML = ''; // Clear list before fetching new data
+        const dbRef = ref(database);
+
+        try {
+            // Fetch active barbers
+            const activeSnapshot = await get(child(dbRef, 'users/Barbers'));
+            if (activeSnapshot.exists()) {
+                displayBarbers(activeSnapshot, 'Active Barbers');
+            }
+
+            // Fetch on-hold barbers
+            const onHoldSnapshot = await get(child(dbRef, 'users/onHoldBarbers'));
+            if (onHoldSnapshot.exists()) {
+                displayBarbers(onHoldSnapshot, 'On-Hold Barbers');
+            }
+
+            if (!activeSnapshot.exists() && !onHoldSnapshot.exists()) {
+                barberList.innerHTML = '<p>No barbers found.</p>';
+            }
+        } catch (error) {
+            console.error("Error fetching barbers: ", error);
+            barberList.innerHTML = '<p>Error loading barbers. Please try again later.</p>';
+        }
+    };
+
+    // Function to display barbers (either active or on-hold)
+    const displayBarbers = (snapshot, status) => {
+        const barberList = document.getElementById('barberList');
+        const statusHeader = document.createElement('h3');
+        statusHeader.innerText = status;
+        barberList.appendChild(statusHeader);
+
+        snapshot.forEach(barberSnapshot => {
+            const barberData = barberSnapshot.val();
+            const barberCard = document.createElement('div');
+            barberCard.className = 'barber-card';
+            barberCard.id = `barber-card-${barberSnapshot.key}`;  // Set the barber card ID
+
+            const profileImageUrl = barberData.profileImageUrl || 'images/profile.jpg';
+            const rating = barberData.rating || 0;
+            const starCount = 5;
+            let starsHtml = '';
+
+            for (let i = 1; i <= starCount; i++) {
+                starsHtml += (i <= rating) ? '<span class="star filled">★</span>' : '<span class="star">★</span>';
+            }
+
+            barberCard.innerHTML = `
+                <img src="${profileImageUrl}" alt="${barberData.barberName}'s Profile Image">
+                <div class="barber-info">
+                    <strong>${barberData.barberName}</strong>
+                    <span style="display: block; color: #555;">${barberData.email}</span>
+                    <div class="ratings-bar">${starsHtml}</div>
+                </div>
+                <button class="pause-resume-btn" id="pause-resume-${barberSnapshot.key}">
+                    <i class="fas fa-${status === 'On-Hold Barbers' ? 'play' : 'pause'}"></i> <!-- Icon changes based on status -->
+                </button>
+                <button class="delete-btn" id="delete-${barberSnapshot.key}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+
+            barberList.appendChild(barberCard);
+
+            // Add event listener to pause/resume button
+            const button = document.getElementById(`pause-resume-${barberSnapshot.key}`);
+            button.addEventListener('click', async () => {
+                const isOnHold = status === 'On-Hold Barbers';
+                await toggleBarberStatus(barberSnapshot.key, isOnHold);
+            });
+
+            // Add event listener to delete button
+            const deleteButton = document.getElementById(`delete-${barberSnapshot.key}`);
+            deleteButton.addEventListener('click', () => {
+                const confirmDelete = confirm(`Do you want to permanently remove "${barberData.barberName}"?`);
+                if (confirmDelete) {
+                    deleteBarber(barberSnapshot.key);
+                }
+            });
+        });
+    };
+
+    // Function to pause/resume barber
+    const toggleBarberStatus = async (barberId, isOnHold) => {
+        const dbRef = ref(database);
+        try {
+            let barberData;
+
+            if (isOnHold) {
+                barberData = await get(child(dbRef, `users/onHoldBarbers/${barberId}`));
+                await set(ref(database, `users/Barbers/${barberId}`), barberData.val());
+                await remove(ref(database, `users/onHoldBarbers/${barberId}`));
+            } else {
+                barberData = await get(child(dbRef, `users/Barbers/${barberId}`));
+                await set(ref(database, `users/onHoldBarbers/${barberId}`), barberData.val());
+                await remove(ref(database, `users/Barbers/${barberId}`));
+            }
+
+            // Remove the barber's current card after the status change
+            document.getElementById(`barber-card-${barberId}`).remove();
+
+            // Re-fetch and display barbers to show the updated status
+            fetchBarbers();
+
+        } catch (error) {
+            console.error("Error toggling barber status: ", error);
+        }
+    };
+
+    // Function to delete barber
+    const deleteBarber = async (barberId) => {
+        try {
+            await remove(ref(database, `users/Barbers/${barberId}`));
+            document.getElementById(`barber-card-${barberId}`).remove();
+        } catch (error) {
+            console.error("Error deleting barber: ", error);
+        }
+    };
+
+    // Initialize fetch when the page loads
+    window.onload = fetchBarbers;
+</script>
+
+
+</body>
+</html>

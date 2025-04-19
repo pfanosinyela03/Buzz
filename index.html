@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber Buzz</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background-color: #003366; /* Blue background */
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header .logo {
+            width: 100px;
+            height: 100px;
+        }
+
+        header nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        header nav a {
+            padding: 10px 20px;
+            background-color: #87CEFA; /* Light blue for login button */
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        header nav a:hover {
+            background-color: #005B96; /* Dark blue on hover */
+        }
+
+        /* Main Section */
+        .main-section {
+            text-align: center;
+            padding: 50px;
+            background-color: white;
+        }
+
+        .main-section h1 {
+            color: #003366;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .main-section p {
+            font-size: 30px;
+            color: #005B96;
+        }
+
+        /* Main Image */
+        .main-image {
+            position: relative;
+            display: block;
+            margin: 0 auto;
+            width: 65%; /* Adjust width to fit better */
+            max-height: 900px; /* Set a fixed height */
+            overflow: hidden; /* Hide overflow for a clean look */
+        }
+
+        .main-image img {
+            width: 100%;
+            height: auto; /* Auto height for better resizing */
+            border-radius: 60px;
+            box-shadow: 0 7px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .main-image img.active {
+            display: block;
+        }
+
+        /* Image Dots */
+        .dots {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .dot {
+            height: 15px;
+            width: 15px;
+            margin: 0 5px;
+            border-radius: 50%;
+            background-color: #bbb;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: #005B96;
+        }
+
+        /* New Service Offer Section */
+        .service-offer {
+            text-align: center;
+            padding: 30px;
+            background-color: white;
+            color: #003366;
+        }
+
+        .service-offer h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .service-offer p {
+            font-size: 16px;
+            color: #005B96;
+        }
+
+        /* Word Boxes Section */
+        .word-boxes {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px;
+            background-color: white;
+        }
+
+        .word-box {
+            border: 2px solid #005B96;
+            border-radius: 10px;
+            padding: 20px;
+            width: 30%;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .word-box:hover {
+            transform: scale(1.05);
+        }
+
+        .word-box h3 {
+            color: #003366;
+        }
+
+        .word-box a {
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #005B96;
+            font-weight: bold;
+        }
+
+        .word-box a:hover {
+            text-decoration: underline;
+        }
+
+        /* Service Images Section */
+        .service-section-title {
+            text-align: center;
+            color: #005B96;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .service-images {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+            background-color: white;
+        }
+
+        .service-images img {
+            width: 250px;
+            height: 250px;
+            border-radius: 125px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+        }
+
+        .service-image-label {
+            text-align: center;
+            color: #005B96;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        /* About Us Section */
+        .about {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px;
+            background-color: white;
+        }
+
+        .about-text {
+            width: 45%;
+            padding: 20px;
+        }
+
+        .about-text h2 {
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .about-text p {
+            font-size: 20px;
+            color: #005B96;
+            margin-bottom: 10px;
+        }
+
+        .about-image {
+            width: 45%;
+            text-align: center;
+        }
+
+        .about-image img {
+            width: 80%;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Contact Form */
+        .contact {
+            padding: 50px;
+            text-align: center;
+            background-color: white;
+            color: #003366;
+        }
+
+        .contact h2 {
+            margin-bottom: 20px;
+        }
+
+        .contact form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact input,
+        .contact textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .contact button {
+            padding: 10px 20px;
+            background-color: #005B96;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .contact button:hover {
+            background-color: #218838;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #000080;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer .social-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 24px;
+        }
+
+        footer .social-links i {
+            font-size: 24px;
+            margin: 0 10px;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <img src="images/logo.jpg" alt="Barber Buzz Logo" class="logo">
+        <nav>
+            <a href="AdminLogin.html">Admin</a>
+            <a href="login.html">Log In</a>
+        </nav>
+    </header>
+
+    <!-- Main Section -->
+    <div class="main-section">
+        <h1>Welcome to Barber Buzz</h1>
+        <p>Skip the line! Discover your perfect look.</p>
+
+        <!-- Main Image Slider -->
+        <div class="main-image">
+            <img src="images/hairstyle1.jpg" alt="Barber Shop Main Image" class="active">
+            <img src="images/hairstyle9.jpg" alt="Barber Shop Image 2">
+            <img src="images/hairstyle10.jpg" alt="Barber Shop Image 3">
+            <div class="dots">
+                <span class="dot active" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Service Offer Section -->
+    <div class="service-offer">
+        <h2>What service would you like us to offer you?</h2>
+        <p>Quick access to the Barber Buzz experience</p>
+    </div>
+
+    <!-- Word Boxes Section -->
+    <div class="word-boxes">
+        <div class="word-box">
+            <i class="fas fa-wrench fa-3x"></i>
+            <h3>High Quality Products</h3>
+            <p>Our hair products are the best in the business.</p>
+            <a href="login.html">Explore</a>
+        </div>
+       
+        <div class="word-box">
+            <i class="fas fa-hands fa-3x"></i>
+            <h3>Top Class Service</h3>
+            <p>Our barbers offer exceptional service.</p>
+            <a href="login.html">Book Now</a>
+        </div>
+    </div>
+
+    <!-- Service Images Section -->
+    <h2 class="service-section-title">Our Services</h2>
+    <div class="service-images">
+        <img src="images/hairstyle1.jpg" alt="Service Style 1">
+        <img src="images/hairstyle2.jpg" alt="Service Style 2">
+        <img src="images/hairstyle3.jpg" alt="Service Style 3">
+    </div>
+
+    <!-- About Us Section -->
+    <div class="about">
+        <div class="about-text">
+            <h2>About Us</h2>
+            <p>Barber Buzz was created to provide a reliable platform for high-quality haircuts that cater to all ages and styles. Our skilled barbers combine classic techniques with modern styles to ensure you look your best for any occasion.</p>
+            <p>From fades to classic styles, we take pride in every cut we make, ensuring that each client walks out looking and feeling their best. Visit us today and experience the ultimate haircut.</p>
+        </div>
+        <div class="about-image">
+            <img src="images/hairstyle8.jpg" alt="About Us Image">
+        </div>
+    </div>
+
+    <!-- Second About Us Section with Image on the Left -->
+    <div class="about">
+        <div class="about-image">
+            <img src="images/hairstyle6.jpg" alt="About Us Image 2">
+        </div>
+        <div class="about-text">
+            <p>Our barbers use the latest techniques and equipment to ensure that every haircut is perfect. We offer a wide range of grooming services to help you look and feel your best.</p>
+            <p>Whether you're getting ready for a special event or just need a trim, our barbers are here to give you the look you want. Book an appointment today and let us take care of the rest.</p>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="contact">
+        <!-- Google Form Embed -->
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSflgOTCf0OJBi_XufRzU_Bg7Q80jecPYlxNUBoHyAV9Vpn1kg/viewform?embedded=true" 
+                width="640" height="824" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+		
+		
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p>&copy; 2024 Barber Buzz. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let slides = document.querySelectorAll('.main-image img');
+            let dots = document.querySelectorAll('.dot');
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            slides[slideIndex-1].classList.add('active');
+            dots[slideIndex-1].classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

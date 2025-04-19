@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barber Requests</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="logoutmodal.css">
+    <style>
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 50px; 
+        }
+
+        .sidebar .logo img {
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%;
+            object-fit: cover; 
+        }
+
+        .sidebar .logo p {
+            margin-top: 5px; 
+            font-size: 25px; 
+            color: #00BF63;  
+            font-weight: bold; 
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            border-radius: 5px;
+        }
+
+        /* Top Navigation Bar Styles */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 250px; 
+            right: 0;
+            height: 89px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000; 
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 40px;
+            padding: 80px 20px 20px; 
+            flex: 1;
+            background-color: #ecf0f1;
+            position: relative; 
+        }
+    .requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .request-card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .request-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .request-card h3 {
+      font-size: 20px;
+      margin: 0;
+      color: #555;
+    }
+
+    .request-card p {
+      font-size: 14px;
+      color: #777;
+      margin: 8px 0;
+    }
+
+    .request-card .button-group {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .request-card button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .approve-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background-color: #45a049;
+    }
+
+    .decline-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .decline-btn:hover {
+      background-color: #e53935;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #ddd;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="images/barberlogo.png" alt="Logo">
+            <p>Barber Buzz</p>
+        </div>
+        <ul>
+           <ul>
+            <li><a href="adminDashboard.html"><i class="fas fa-home"></i>Dashboard</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Users</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i>Orders</a></li>
+            <li><a href="add-hairstyle.html"><i class="fas fa-user-edit"></"></i>Add Hairstyle</a></li>
+            <li><a href="add-product.html"><i class="fas fa-plus-circle"></i>Add Product</a></li>
+            <li><a href="manage-products.html"><i class="fas fa-boxes"></i>Products</a></li>
+            <li><a href="view-hairstyles.html"><i class="fas fa-cut"></i>Hairstyles</a></li>
+            <li><a href="approve-request.html"><i class="fas fa-user-check"></i>Barber Requests</a></li>
+            <li><a href="adminAppointments.html"><i class="fas fa-calendar-alt"></i>Appointments</a></li>
+			<li><a href="adminbarbers.html"><i class="fas fa-user-friends"></i>Barbers</a></li>
+            <li><a href="adminsettings.html"><i class="fas fa-cogs"></i>Settings</a></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
+        </ul>
+    </div>
+
+
+
+    <div class="top-nav">
+        <h1>Barber Registration Requests</h1>
+       
+      
+    </div>
+
+ <div class="main-content">
+  <div id="requestsList" class="requests-grid"></div>
+  </div>
+  
+  
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmLogout">Yes</button>
+                <button class="cancel-btn" id="cancelLogout">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+ <script>
+        
+        const modal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeBtn = document.querySelector('.close');
+        const confirmLogout = document.getElementById('confirmLogout');
+        const cancelLogout = document.getElementById('cancelLogout');
+
+       
+        logoutBtn.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            modal.style.display = 'block';
+        });
+
+        
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        confirmLogout.onclick = function() {
+            window.location.href = 'home.html';
+        };
+
+       
+        cancelLogout.onclick = function() {
+            modal.style.display = 'none';
+        };
+    </script>
+
+  <script type="module">
+    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTO5Dn0L0HgZfaw2zxjSHK-TmAyD29jFw",
+      authDomain: "barberbuzz-d6811.firebaseapp.com",
+      databaseURL: "https://barberbuzz-d6811-default-rtdb.firebaseio.com",
+      projectId: "barberbuzz-d6811",
+      storageBucket: "barberbuzz-d6811.appspot.com",
+      messagingSenderId: "564879600873",
+      appId: "1:564879600873:web:2308af42d9418ce8439478"
+    };
+
+    
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+	
+    
+    const requestsRef = ref(database, 'requests/');
+    onValue(requestsRef, (snapshot) => {
+      const requestsList = document.getElementById('requestsList');
+      requestsList.innerHTML = ''; 
+
+      snapshot.forEach((childSnapshot) => {
+        const request = childSnapshot.val();
+        const requestKey = childSnapshot.key;
+
+        const requestItem = document.createElement('div');
+        requestItem.classList.add('request-card');
+        requestItem.innerHTML = `
+          <h3>${request.barberName}</h3>
+          <p>Email: ${request.email}</p>
+          <p>Status: ${request.status}</p>
+          <div class="button-group">
+            <button class="approve-btn" onclick="approveRequest('${requestKey}', '${request.barberName}', '${request.email}', '${request.password}')">Approve</button>
+            <button class="decline-btn" onclick="declineRequest('${requestKey}', '${request.barberName}', '${request.email}')">Decline</button>
+          </div>
+        `;
+        requestsList.appendChild(requestItem);
+      });
+    });
+
+    // Approve request function
+    window.approveRequest = function(requestKey, barberName, email, password) {
+      // Save barber info to users/Barbers node
+      set(ref(database, 'users/Barbers/' + barberName), {
+        barberName: barberName,
+        email: email,
+        password: password,
+		status:  "approved"
+      })
+      .then(() => {
+        // Remove the request from the requests node
+        remove(ref(database, 'requests/' + requestKey))
+          .then(() => {
+            alert("Request approved and barber added successfully!");
+
+            // Send approval email automatically
+            sendEmail('template_i315p3p', barberName, email);
+          })
+          .catch((error) => {
+            alert("Error removing request: " + error.message);
+          });
+      })
+      .catch((error) => {
+        alert("Error adding barber: " + error.message);
+      });
+    };
+
+    // Decline request function
+    window.declineRequest = function(requestKey, barberName, email) {
+      // Remove the request from the database
+      remove(ref(database, 'requests/' + requestKey))
+        .then(() => {
+          alert("Request declined!");
+
+          // Send decline email automatically
+          sendEmail('template_rbdkor8', barberName, email);
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
+    };
+
+    // Initialize EmailJS
+    emailjs.init('kW83fRiy4J-qkj_oh');
+
+    // Function to send email using EmailJS
+    function sendEmail(templateID, barberName, email) {
+      const serviceID = 'default_service';  // Use your EmailJS service ID
+      const formData = {
+        barberName: barberName,
+        email: email,
+        reply_to: 'no-reply@example.com'  // Set reply-to field
+      };
+
+      // Send email using the specified template
+      emailjs.send(serviceID, templateID, formData)
+        .then(() => {
+          console.log('Email sent successfully!');
+        }, (err) => {
+          console.log('Failed to send email: ' + JSON.stringify(err));
+        });
+    }
+  </script>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</body>
+</html>
